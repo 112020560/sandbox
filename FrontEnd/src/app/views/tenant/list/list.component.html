@@ -1,0 +1,231 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i> Tenants configurados
+      </div>
+      <div class="card-body">
+        <p *ngIf="tenants.length === 0">Cargando...</p>
+        <p-progressBar mode="indeterminate" [style]="{'height': '6px'}" *ngIf="tenants.length == 0">
+        </p-progressBar>
+        <div class="table-responsive" *ngIf="tenants.length > 0">
+          <p-table #dt [columns]="cols" [value]="tenants" [paginator]="true" [rows]="10" [resizableColumns]="true" columnResizeMode="expand"
+            selectionMode="single" [(selection)]="selectedTenant" (onRowSelect)="onRowSelect($event)" style="width: 100%;">
+            <ng-template pTemplate="caption">
+              <div style="text-align: right">
+                <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+                <input type="text" pInputText size="50" placeholder="Global Filter"
+                  (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+              </div>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+              <tr>
+                <th *ngFor="let col of columns" pResizableColumn>
+                  {{col.header}}
+                </th>
+                <th pResizableColumn *ngIf="env != 'Prod'" >Migrar</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-columns="columns">
+              <tr [pSelectableRow]="rowData">
+                <td class="ui-resizable-column">{{rowData['id']}}</td>
+                <td class="ui-resizable-column">{{rowData['TenantId']}}</td>
+                <td class="ui-resizable-column">{{rowData['Name']}}</td>
+                <td class="ui-resizable-column">{{rowData['Description']}}</td>
+                <td class="ui-resizable-column">{{rowData['EnvironmentId']}}</td>
+                <td class="ui-resizable-column">{{rowData['ApplicationId']}}</td>
+                <!-- <td class="ui-resizable-column">{{rowData['Configuration']}}</td> -->
+                <td class="ui-resizable-column column-center">
+                  <button (click)="showEditor(rowData['Configuration'])" pButton type="button" class="ui-button-secondary" icon="pi pi-cog"></button>
+                </td>
+                <td class="ui-resizable-column">{{rowData['CreateAt'] | date: 'dd/MM/yyyy'}}</td>
+                <td class="ui-resizable-column">{{rowData['ExpiredAt']}}</td>
+                <td class="ui-resizable-column">{{rowData['AprovedBy']}}</td>
+                <td class="ui-resizable-column" *ngIf="env != 'Prod'">
+                  <button  pButton type="button" label="Publicar" class="ui-button-rounded ui-button-success" (click)="onMigrate(rowData['id'])" ></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="summary" let-rowData>
+              <div style="text-align:left">
+                <button type="button" pButton icon="pi pi-plus" (click)="showDialogToAdd()" label="Agregar"></button>
+              </div>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog header="Editar Config" [(visible)]="displayConfig" [focusOnShow]="false" [responsive]="true"
+  showEffect="fade" [modal]="true" [style]="{width: '60vw', height:'70vw'}" [baseZIndex]="10000">
+  <json-editor [options]="editorOptions" [data]="data" class="ace_editor.ace-jsoneditor" ></json-editor>
+</p-dialog>
+
+<p-dialog header="Mantenimiento del Tenant" [(visible)]="displayDialog" [focusOnShow]="false" [responsive]="true"
+  showEffect="fade" [modal]="true" [style]="{width: '700px'}">
+  <div class="p-grid ui-fluid" *ngIf="tenant">
+    <div class="p-col-4">
+      <label for="TenantId">Id</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="TenantId" [(ngModel)]="tenant.id" autofocus  readonly/>
+    </div>
+    <div class="p-col-4">
+      <label for="TenantId">TenantId</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="TenantId" [(ngModel)]="tenant.TenantId" autofocus />
+    </div>
+    <div class="p-col-4">
+      <label for="Name">Nombre</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Name" [(ngModel)]="tenant.Name" />
+    </div>
+    <div class="p-col-4">
+      <label for="Description">Descripcion</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Description" [(ngModel)]="tenant.Description" />
+    </div>
+    <div class="p-col-4">
+      <label for="EnvironmentId">Ambiente</label>
+    </div>
+    <div class="p-col-8">
+      <!-- <input pInputText id="EnvironmentId" [(ngModel)]="tenant.EnvironmentId" /> -->
+      <p-dropdown [options]="environments" [(ngModel)]="tenant.EnvironmentId"></p-dropdown>
+    </div>
+    <div class="p-col-4">
+      <label for="ApplicationId">Aplicativos</label>
+    </div>
+    <div class="p-col-8">
+      <!-- <textarea pInputText id="ApplicationId" [(ngModel)]="tenant.ApplicationId"></textarea> -->
+      <p-multiSelect [options]="applications" [(ngModel)]="tenant.ApplicationId"></p-multiSelect>
+    </div>
+    <div class="p-col-4">
+      <label for="CreateAt">Creado</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="CreateAt" [(ngModel)]="tenant.CreateAt" />
+    </div>
+
+    <!-- <div class="p-col-4">
+      <label for="Configuration">Configuracion</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Configuration" [(ngModel)]="tenant.Configuration" />
+    </div> -->
+
+    <div class="p-col-4">
+      <label for="ExpiredAt">Expira</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ExpiredAt" [(ngModel)]="tenant.ExpiredAt" />
+    </div>
+    <div class="p-col-4">
+      <label for="AprovedBy">Aprobado por</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="AprovedBy" [(ngModel)]="tenant.AprovedBy" />
+    </div>
+
+    <div class="p-col-4">
+      <label for="CreateAt">AppSetting</label>
+    </div>
+    <div class="p-col-8">
+      <button (click)="showEditor(tenant.Configuration)" pButton type="button" class="ui-button-secondary" icon="pi pi-cog"></button>
+    </div>
+  </div>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" pButton icon="pi pi-times" (click)="onDelete()" label="Delete" class="ui-button-danger"></button>
+      <button type="button" pButton icon="pi pi-check" (click)="onUpdate()" label="Save"></button>
+    </div>
+  </p-footer>
+</p-dialog>
+
+
+<p-dialog header="Aprovacion de ambiente" [(visible)]="displayDialog" [focusOnShow]="false" [responsive]="true"
+  showEffect="fade" [modal]="true" [style]="{width: '700px'}">
+  <div class="p-grid ui-fluid" *ngIf="tenant">
+    <div class="p-col-4">
+      <label for="TenantId">Id</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="TenantId" [(ngModel)]="tenant.id" autofocus  readonly/>
+    </div>
+    <div class="p-col-4">
+      <label for="TenantId">TenantId</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="TenantId" [(ngModel)]="tenant.TenantId" autofocus />
+    </div>
+    <div class="p-col-4">
+      <label for="Name">Nombre</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Name" [(ngModel)]="tenant.Name" />
+    </div>
+    <div class="p-col-4">
+      <label for="Description">Descripcion</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Description" [(ngModel)]="tenant.Description" />
+    </div>
+    <div class="p-col-4">
+      <label for="EnvironmentId">Ambiente</label>
+    </div>
+    <div class="p-col-8">
+      <!-- <input pInputText id="EnvironmentId" [(ngModel)]="tenant.EnvironmentId" /> -->
+      <p-dropdown [options]="environments" [(ngModel)]="tenant.EnvironmentId"></p-dropdown>
+    </div>
+    <div class="p-col-4">
+      <label for="ApplicationId">Aplicativos</label>
+    </div>
+    <div class="p-col-8">
+      <!-- <textarea pInputText id="ApplicationId" [(ngModel)]="tenant.ApplicationId"></textarea> -->
+      <p-multiSelect [options]="applications" [(ngModel)]="tenant.ApplicationId"></p-multiSelect>
+    </div>
+    <div class="p-col-4">
+      <label for="CreateAt">Creado</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="CreateAt" [(ngModel)]="tenant.CreateAt" />
+    </div>
+
+    <!-- <div class="p-col-4">
+      <label for="Configuration">Configuracion</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Configuration" [(ngModel)]="tenant.Configuration" />
+    </div> -->
+
+    <div class="p-col-4">
+      <label for="ExpiredAt">Expira</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ExpiredAt" [(ngModel)]="tenant.ExpiredAt" />
+    </div>
+    <div class="p-col-4">
+      <label for="AprovedBy">Aprobado por</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="AprovedBy" [(ngModel)]="tenant.AprovedBy" />
+    </div>
+
+    <div class="p-col-4">
+      <label for="CreateAt">AppSetting</label>
+    </div>
+    <div class="p-col-8">
+      <button (click)="showEditor(tenant.Configuration)" pButton type="button" class="ui-button-secondary" icon="pi pi-cog"></button>
+    </div>
+  </div>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" pButton icon="pi pi-times" (click)="onDelete()" label="Delete" class="ui-button-danger"></button>
+      <button type="button" pButton icon="pi pi-check" (click)="onUpdate()" label="Save"></button>
+    </div>
+  </p-footer>
+</p-dialog>

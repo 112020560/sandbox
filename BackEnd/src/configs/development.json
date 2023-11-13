@@ -1,0 +1,19 @@
+{
+    "env": "development",
+    "dbConfig": {
+        "host": "mongodb+srv://cluster0.yh8to.mongodb.net",
+        "user": "sandbox",
+        "password": "nbZl1DXvxXu4kggM",
+        "database": "SandBox2",
+        "url": "mongodb+srv://sandbox:nbZl1DXvxXu4kggM@cluster0.yh8to.mongodb.net/SandBox2"
+    },
+    "secretKey": "secretKey",
+    "log": {
+        "format": "dev",
+        "dir": "../logs"
+    },
+    "cors": {
+        "origin": true,
+        "credentials": true
+    }
+}

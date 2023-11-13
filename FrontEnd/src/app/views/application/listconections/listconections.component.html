@@ -1,0 +1,126 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i>Llaves de conexión configuradas para <b>{{applicationId}}</b>
+      </div>
+      <div class="card-body">
+        <div class="row mt-4">
+          <div class="col">
+            <div class="table-responsive">
+              <p-table #dt [columns]="cols" [value]="connections" [paginator]="true" [rows]="10"
+                [resizableColumns]="true" selectionMode="single" [(selection)]="selectedConnection"
+                (onRowSelect)="onRowSelect($event)">
+                <ng-template pTemplate="caption">
+                  <div style="text-align: right">
+                    <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+                    <input type="text" pInputText size="50" placeholder="Global Filter"
+                      (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="header" let-columns>
+                  <tr>
+                    <th *ngFor="let col of columns">
+                      {{col.header}}
+                    </th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-rowData let-columns="columns">
+                  <tr [pSelectableRow]="rowData">
+                    <td>{{rowData['Type']}}</td>
+                    <td>{{rowData['ConnectionKey00']}}</td>
+                    <td>{{rowData['ConnectionKey01']}}</td>
+                    <td>{{rowData['ConnectionKey02']}}</td>
+                    <td>{{rowData['UserName']}}</td>
+                    <td>{{rowData['Password']}}</td>
+                    <td>{{rowData['Port']}}</td>
+                    <td>{{rowData['DataBase']}}</td>
+                    <td>{{rowData['SSLMode']}}</td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="summary" let-rowData>
+                  <div style="text-align:left">
+                    <button type="button" pButton icon="pi pi-plus" (click)="showDialogToAdd()"
+                      label="Agregar"></button>
+                  </div>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--/.col-->
+</div>
+
+
+
+<p-dialog header="Detalle de la conexión" [(visible)]="displayDialog" [focusOnShow]="false" [responsive]="true"
+  showEffect="fade" [modal]="true" [style]="{width: '700px'}">
+  <div class="p-grid ui-fluid" *ngIf="connection">
+    <div class="p-col-4">
+      <label for="Type">Tipo</label>
+    </div>
+    <div class="p-col-8">
+      <!-- <input pInputText id="Type" [(ngModel)]="connection.Type" autofocus /> -->
+      <p-dropdown [options]="dataTypes" [(ngModel)]="connection.Type"></p-dropdown>
+    </div>
+    <div class="p-col-4">
+      <label for="ConnectionKey00">Llave00</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ConnectionKey00" [(ngModel)]="connection.ConnectionKey00"  (ngModelChange)="onchenge($event)"/>
+    </div>
+    <div class="p-col-4">
+      <label for="ConnectionKey01">Llave01</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ConnectionKey01" [(ngModel)]="connection.ConnectionKey01" />
+    </div>
+    <div class="p-col-4">
+      <label for="ConnectionKey02">Llave02</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ConnectionKey02" [(ngModel)]="connection.ConnectionKey02" />
+    </div>
+    <div class="p-col-4">
+      <label for="UserName">Usuario</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="UserName" [(ngModel)]="connection.UserName"/>
+    </div>
+    <div class="p-col-4">
+      <label for="Password">Password</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Password" [(ngModel)]="connection.Password"/>
+    </div>
+    <div class="p-col-4">
+      <label for="Port">Port</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Port" [(ngModel)]="connection.Port"/>
+    </div>
+    <div class="p-col-4">
+      <label for="DataBase">Base Datos</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="DataBase" [(ngModel)]="connection.DataBase"/>
+    </div>
+    <div class="p-col-4">
+      <label for="SSLMode">SSLMode</label>
+    </div>
+    <div class="p-col-8">
+      <!-- <input pInputText id="SSLMode" [(ngModel)]="connection.SSLMode"/> -->
+      <p-dropdown id="SSLMode" [options]="sslmodeTypes" [(ngModel)]="connection.SSLMode"></p-dropdown>
+    </div>
+  </div>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" pButton icon="pi pi-times" (click)="onDelete()" label="Delete"
+        class="ui-button-danger"></button>
+      <button type="button" pButton icon="pi pi-check" (click)="onUpdate()" label="Save"></button>
+    </div>
+  </p-footer>
+</p-dialog>

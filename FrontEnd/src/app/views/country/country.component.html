@@ -1,0 +1,123 @@
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <strong>Mantenimiento países</strong>
+        </div>
+        <div class="card-body">
+
+          <p *ngIf="paises.length === 0">Cargando...</p>
+          <p-progressBar mode="indeterminate" [style]="{'height': '6px'}" *ngIf="paises.length == 0">
+          </p-progressBar>
+
+          <div class="table-responsive" *ngIf="paises.length > 0">
+            <p-table #dt [columns]="cols" [value]="paises" [paginator]="true" [rows]="10" [resizableColumns]="true"
+              selectionMode="single" [(selection)]="selectedApplication" (onRowSelect)="onRowSelect($event)">
+              <ng-template pTemplate="caption">
+                <div style="text-align: right">
+                  <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+                  <input type="text" pInputText size="50" placeholder="Global Filter"
+                    (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header" let-columns>
+                <tr>
+                  <th *ngFor="let col of columns">
+                    {{col.header}}
+                  </th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rowData let-columns="columns">
+                <tr [pSelectableRow]="rowData">
+                  <td>{{rowData['code']}}</td>
+                  <td>{{rowData['cod_area']}}</td>
+                  <td>{{rowData['name']}}</td>
+                  <td>{{rowData['abbreviation']}}</td>
+                  <td>{{rowData['domain']}}</td>
+                  <td>{{rowData['source_core']}}</td>
+                  <td>{{rowData['ldap']}}</td>
+                  <td *ngIf="rowData['enable']">
+                    <span class="badge badge-success">Activo</span>
+                  </td>
+                  <td *ngIf="!rowData['enable']">
+                    <span class="badge badge-danger">Inactivo</span>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="summary" let-rowData>
+                <div style="text-align:left">
+                  <button type="button" pButton icon="pi pi-plus" (click)="showDialogToAdd()" label="Agregar"></button>
+                </div>
+              </ng-template>
+            </p-table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<p-dialog header="Mantenimiento para la colección país" [(visible)]="displayDialog" [focusOnShow]="false" [responsive]="true"
+  showEffect="fade" [modal]="true" [style]="{width: '700px'}">
+  <div class="p-grid ui-fluid" *ngIf="pais">
+    <div class="p-col-4">
+      <label for="codigo">Código</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="codigo" [(ngModel)]="pais.code" autofocus  readonly/>
+    </div>
+    <div class="p-col-4">
+      <label for="codarea">Cod.Area</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="codarea" [(ngModel)]="pais.cod_area" autofocus />
+    </div>
+    <div class="p-col-4">
+      <label for="Name">Nombre</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Name" [(ngModel)]="pais.name" />
+    </div>
+    <div class="p-col-4">
+      <label for="abbreviation">Abreviación</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="abbreviation" [(ngModel)]="pais.abbreviation" />
+    </div>
+    <div class="p-col-4">
+      <label for="domain">Dominio</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="domain" [(ngModel)]="pais.domain" />
+    </div>
+    <div class="p-col-4">
+      <label for="fuente">Fuente</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="fuente" [(ngModel)]="pais.source_core" />
+      <!-- <textarea pInputText id="ApplicationId" [(ngModel)]="tenant.ApplicationId"></textarea> -->
+    </div>
+    <div class="p-col-4">
+      <label for="ldap">ldap</label>
+    </div>
+    <div class="p-col-8">
+      <textarea pInputText id="ldap" [(ngModel)]="pais.ldap"></textarea>
+    </div>
+    <div class="p-col-4">
+      <label for="IsEnable">Estado</label>
+    </div>
+    <div class="p-col-8">
+      <p-inputSwitch id="IsEnable" [(ngModel)]="pais.enable"></p-inputSwitch>
+    </div>
+  </div>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" pButton icon="pi pi-times" (click)="onDelete()" label="Delete" class="ui-button-danger"></button>
+      <button type="button" pButton icon="pi pi-check" (click)="onUpdate()" label="Save"></button>
+    </div>
+  </p-footer>
+</p-dialog>
+

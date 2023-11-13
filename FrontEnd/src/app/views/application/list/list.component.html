@@ -1,0 +1,182 @@
+<!-- <p-toast></p-toast> -->
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i> Aplicativos configurados
+      </div>
+      <div class="card-body">
+        <p *ngIf="applications.length === 0">Cargando...</p>
+        <p-progressBar mode="indeterminate" [style]="{'height': '6px'}" *ngIf="applications.length == 0">
+        </p-progressBar>
+        <div class="table-responsive" *ngIf="applications.length > 0">
+          <p-table #dt [columns]="cols" [value]="applications" [paginator]="true" [rows]="10" [resizableColumns]="true" columnResizeMode="expand"
+            selectionMode="single" [(selection)]="selectedApplication" (onRowSelect)="onRowSelect($event)">
+            <ng-template pTemplate="caption">
+              <div style="text-align: right">
+                <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+                <input type="text" pInputText size="50" placeholder="Global Filter"
+                  (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+              </div>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+              <tr>
+                <th *ngFor="let col of columns" pResizableColumn>
+                  {{col.header}}
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-columns="columns">
+              <tr [pSelectableRow]="rowData">
+                <td class="ui-resizable-column">{{rowData['ApplicationCode']}}</td>
+                <td class="ui-resizable-column">{{rowData['ApplicationId']}}</td>
+                <td class="ui-resizable-column">{{rowData['ApplicationName']}}</td>
+                <td class="ui-resizable-column">{{rowData['Description']}}</td>
+                <td class="ui-resizable-column">{{rowData['Country']}}</td>
+                <td *ngIf="rowData['IsEnable']">
+                  <span class="badge badge-success">Activo</span>
+                </td>
+                <td *ngIf="!rowData['IsEnable']" class="ui-resizable-column">
+                  <span class="badge badge-danger">Inactivo</span>
+                </td>
+                <td class="ui-resizable-column"><a href="Javascript:void(0)"
+                    (click)="onfindConnections(rowData['ApplicationId'])">{{rowData['Connections'].length}}</a></td>
+                <td class="ui-resizable-column"><a href="Javascript:void(0)"
+                    (click)="onfindProcedure(rowData['ApplicationId'])">{{rowData['Procedures'].length}}</a></td>
+                <td class="ui-resizable-column"><a href="Javascript:void(0)"
+                    (click)="onfindProperties(rowData['ApplicationId'])">{{rowData['ExtendedProperties'].length}}</a>
+                </td>
+                <!-- <td><button pButton type="button" icon="pi pi-check"></button></td>
+                <td><button pButton type="button" icon="pi pi-check"></button></td>
+                <td><button pButton type="button" icon="pi pi-check"></button></td> -->
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="summary" let-rowData>
+              <div style="text-align:left">
+                <button type="button" pButton icon="pi pi-plus" (click)="showDialogToAdd()" label="Agregar"></button>
+                <button type="button" pButton icon="pi pi-plus" (click)="showDialogToImport()"
+                  label="Importar"></button>
+              </div>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog header="Mantenimiento del aplicativo" [(visible)]="displayDialog" [focusOnShow]="false" [responsive]="true"
+  showEffect="fade" [modal]="true" [style]="{width: '700px'}">
+  <div class="p-grid ui-fluid" *ngIf="application">
+    <div class="p-col-4">
+      <label for="ApplicationCode">Codigo</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ApplicationCode" [(ngModel)]="application.ApplicationCode" autofocus />
+    </div>
+    <div class="p-col-4">
+      <label for="ApplicationId">Identificador</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ApplicationId" [(ngModel)]="application.ApplicationId" />
+    </div>
+    <div class="p-col-4">
+      <label for="ApplicationName">Nombre</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ApplicationName" [(ngModel)]="application.ApplicationName" />
+    </div>
+    <div class="p-col-4">
+      <label for="Description">Descripción</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Description" [(ngModel)]="application.Description" />
+    </div>
+    <div class="p-col-4">
+      <label for="Country">Países</label>
+    </div>
+    <div class="p-col-8">
+      <p-multiSelect id="Country" [options]="countries" [(ngModel)]="application.Country"></p-multiSelect>
+    </div>
+    <div class="p-col-4">
+      <label for="IsEnable">Activo</label>
+    </div>
+    <div class="p-col-8">
+      <!-- <input pInputText id="IsEnable" [(ngModel)]="application.IsEnable" /> -->
+      <p-inputSwitch id="IsEnable" [(ngModel)]="application.IsEnable"></p-inputSwitch>
+    </div>
+
+    <div class="p-col-4">
+      <label for="IsEnable">Valida Parámetros</label>
+    </div>
+    <div class="p-col-8">
+      <!-- <input pInputText id="IsEnable" [(ngModel)]="application.IsEnable" /> -->
+      <p-inputSwitch id="IsEnable" [(ngModel)]="application.AllowProcedure"></p-inputSwitch>
+    </div>
+  </div>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" pButton icon="pi pi-times" (click)="onDelete()" label="Delete" class="ui-button-danger"></button>
+      <button type="button" pButton icon="pi pi-check" (click)="onUpdate()" label="Save"></button>
+      <button type="button" pButton icon="pi pi-check" (click)="onShowClone()" label="Clonar" class="ui-button-success" *ngIf="!this.newApplication"></button>
+    </div>
+  </p-footer>
+</p-dialog>
+
+
+<p-dialog header="Mantenimiento del aplicativo" [(visible)]="displayCloneDialog" [focusOnShow]="false"
+  [responsive]="true" showEffect="fade" [modal]="true" [style]="{width: '700px'}">
+  <div class="p-grid ui-fluid" *ngIf="cloneApplication">
+    <div class="p-col-4">
+      <label for="ApplicationCode">Codigo</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ApplicationCode" [(ngModel)]="cloneApplication.ApplicationCode" autofocus />
+    </div>
+    <div class="p-col-4">
+      <label for="ApplicationId">Identificador</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ApplicationId" [(ngModel)]="cloneApplication.ApplicationId" />
+    </div>
+    <div class="p-col-4">
+      <label for="Description">Descripción</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Description" [(ngModel)]="cloneApplication.Description" />
+    </div>
+    <div class="p-col-4">
+      <label for="Country">Países</label>
+    </div>
+    <div class="p-col-8">
+      <!-- <input pInputText id="Country" [(ngModel)]="cloneApplication.Country" /> -->
+      <p-multiSelect id="Country" [options]="countries" [(ngModel)]="cloneApplication.Country"></p-multiSelect>
+    </div>
+  </div>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" pButton icon="pi pi-check" (click)="onClone()" label="Clonar"
+        class="ui-button-success"></button>
+    </div>
+  </p-footer>
+</p-dialog>
+
+
+<p-dialog header="Mantenimiento del aplicativo" [(visible)]="displayImportDialog" [focusOnShow]="false"
+  [responsive]="true" showEffect="fade" [modal]="true" [style]="{width: '700px'}">
+  <div class="p-grid ui-fluid">
+    <div class="p-col-4">
+      <label for="ApplicationCode">Codigo</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="ApplicationCode" [(ngModel)]="id_old_core" autofocus />
+    </div>
+  </div>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" pButton icon="pi pi-check" (click)="onImport()" label="Importar"
+        class="ui-button-success"></button>
+    </div>
+  </p-footer>
+</p-dialog>

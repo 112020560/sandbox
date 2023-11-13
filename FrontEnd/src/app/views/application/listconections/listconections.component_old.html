@@ -1,0 +1,154 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-align-justify"></i>Llaves de conexión para <b>{{application.ApplicationId}}</b>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-6 col-sm-4 col-md-2 col-xl mb-3 mb-xl-0">
+            <button type="button" class="btn btn-block btn-primary" (click)="openModal(nuevo)" >Nueva</button>
+          </div>
+          <div class="col-6 col-sm-4 col-md-2 col-xl mb-3 mb-xl-0"></div>
+          <div class="col-6 col-sm-4 col-md-2 col-xl mb-3 mb-xl-0"></div>
+          <div class="col-6 col-sm-4 col-md-2 col-xl mb-3 mb-xl-0"></div>
+          <div class="col-6 col-sm-4 col-md-2 col-xl mb-3 mb-xl-0"></div>
+          <div class="col-6 col-sm-4 col-md-2 col-xl mb-3 mb-xl-0"></div>
+          <div class="col-6 col-sm-4 col-md-2 col-xl mb-3 mb-xl-0"></div>
+          <div class="col-6 col-sm-4 col-md-2 col-xl mb-3 mb-xl-0"></div>
+          <div class="col-6 col-sm-4 col-md-2 col-xl mb-3 mb-xl-0"></div>
+        </div>
+        <div class="row mt-4">
+          <div class="col">
+            <table class="table table-bordered table-striped table-sm">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Llave00</th>
+                  <th>Llave01</th>
+                  <th>Llave02</th>
+                  <th>Usuario</th>
+                  <!-- <th>ReqAprove</th> -->
+                  <th>Password</th>
+                  <th>BaseDatos</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let app of connections">
+                  <td>{{app.Type}}</td>
+                  <td>{{app.ConnectionKey00}}</td>
+                  <td>{{app.ConnectionKey01}}</td>
+                  <td>{{app.ConnectionKey02}}</td>
+                  <td>{{app.UserName}}</td>
+                  <td>{{app.Password}}</td>
+                  <td>{{app.DataBase}}</td>
+                  <td>
+                    <button type="button" class="btn btn-brand btn-sm btn-stack-overflow mr-1" style="margin-bottom: 4px" (click)="onUpdate(nuevo, app.ConnectionKey00)" >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-brand btn-sm btn-youtube mr-1" style="margin-bottom: 4px" (click)="onDelete(confirm, app.ConnectionKey00)" >
+                      <i class="fa fa-eraser"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <nav>
+          <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#">Prev</a></li>
+            <li class="page-item active">
+              <a class="page-link" href="#">1</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">4</a></li>
+            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <!--/.col-->
+</div>
+
+<ng-template #nuevo>
+  <div class="modal-header">
+     <h4 class="modal-title pull-left">Nueva Conexión Base de Datos</h4>
+     <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">×</span>
+     </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col">
+        <form [formGroup]="connectionFomrm">
+          <div class="row">
+            <div class="form-group col-sm-8">
+              <label for="ccmonth">Tipo</label>
+              <select class="form-control" id="ccmonth"  formControlName="tipo">
+                <option value="MSSQL" >MSSQL</option>
+                <option value="MYSQL" >MYSQL</option>
+                <option value="ORACLE" >ORACLE</option>
+                <option value="MONGODB" >MONGODB</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-4">
+              <label for="name">Llave00</label>
+              <input type="text" class="form-control" id="key00" placeholder="" formControlName="llave00">
+            </div>
+            <div class="form-group col-sm-4">
+              <label for="name">Llave01</label>
+              <input type="text" class="form-control" id="key01" placeholder="" formControlName="llave01">
+            </div>
+            <div class="form-group col-sm-4">
+              <label for="name">Llave02</label>
+              <input type="text" class="form-control" id="key02" placeholder="" formControlName="llave02">
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-4">
+              <label for="name">Usuario</label>
+              <input type="text" class="form-control" id="dbusername" placeholder="" formControlName="usuario">
+            </div>
+            <div class="form-group col-sm-4">
+              <label for="name">Password</label>
+              <input type="text" class="form-control" id="dbpassword" placeholder="" formControlName="password">
+            </div>
+            <div class="form-group col-sm-4">
+              <label for="name">Base de Datos</label>
+              <input type="text" class="form-control" id="database" placeholder="" formControlName="base_datos">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+     <button type="button" class="btn btn-primary" (click)="onSaveConnection()">Guardar</button>
+     <button type="button" class="btn btn-secondary" (click)="modalRef.hide()" (click)="onSaveConnection()">Cancelar</button>
+  </div>
+</ng-template>
+
+
+
+
+<ng-template #confirm>
+  <div class="modal-header">
+     <h4 class="modal-title pull-left">Eliminar llave conexión</h4>
+     <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">×</span>
+     </button>
+  </div>
+  <div class="modal-body">
+    <p>Seguro que desea eliminar el registro?</p>
+  </div>
+  <div class="modal-footer">
+     <button type="button" class="btn btn-danger" (click)="onDeleteAction()">Eliminar</button>
+     <button type="button" class="btn btn-secondary" (click)="modalRef.hide()" (click)="onSaveConnection()">Cancelar</button>
+  </div>
+</ng-template>

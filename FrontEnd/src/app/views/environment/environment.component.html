@@ -1,0 +1,122 @@
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <strong>Mantenimiento Ambientes</strong>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+
+              <p *ngIf="environments.length === 0">Cargando...</p>
+              <p-progressBar mode="indeterminate" [style]="{'height': '6px'}" *ngIf="environments.length == 0">
+              </p-progressBar>
+
+              <div class="table-responsive" *ngIf="environments.length > 0">
+                <p-table #dt [columns]="cols" [value]="environments" [paginator]="true" [rows]="10" [resizableColumns]="true"
+                  selectionMode="single" [(selection)]="selectedApplication" (onRowSelect)="onRowSelect($event)">
+                  <ng-template pTemplate="caption">
+                    <div style="text-align: right">
+                      <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+                      <input type="text" pInputText size="50" placeholder="Global Filter"
+                        (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+                    </div>
+                  </ng-template>
+                  <ng-template pTemplate="header" let-columns>
+                    <tr>
+                      <th *ngFor="let col of columns">
+                        {{col.header}}
+                      </th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-rowData let-columns="columns">
+                    <tr [pSelectableRow]="rowData">
+                      <td>{{rowData['EnvironmetId']}}</td>
+                      <td>{{rowData['Name']}}</td>
+                      <td>{{rowData['Description']}}</td>
+                      <td class="ui-resizable-column column-center">
+                        <button (click)="showInstanceConfig(rowData['Instances'])" pButton type="button" class="ui-button-secondary" icon="pi pi-cog"></button>
+                      </td>
+                      <td class="ui-resizable-column column-center">
+                        <button (click)="showEndpointsConfig(rowData['EndPoints'])" pButton type="button" class="ui-button-secondary" icon="pi pi-cog"></button>
+                      </td>
+                      <td *ngIf="rowData['IsEnable']">
+                        <span class="badge badge-success">Activo</span>
+                      </td>
+                      <td *ngIf="!rowData['IsEnable']">
+                        <span class="badge badge-danger">Inactivo</span>
+                      </td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="summary" let-rowData>
+                    <div style="text-align:left">
+                      <button type="button" pButton icon="pi pi-plus" (click)="showDialogToAdd()" label="Agregar"></button>
+                    </div>
+                  </ng-template>
+                </p-table>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<p-dialog header="Editar Config" [(visible)]="displayConfig" [focusOnShow]="false" [responsive]="true"
+  showEffect="fade" [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="10000">
+  <json-editor [options]="editorOptions" [data]="data" class="ace_editor.ace-jsoneditor"></json-editor>
+</p-dialog>
+
+
+<p-dialog header="Mantenimiento del Tenant" [(visible)]="displayDialog" [focusOnShow]="false" [responsive]="true"
+  showEffect="fade" [modal]="true" [style]="{width: '700px'}">
+  <div class="p-grid ui-fluid" *ngIf="environment">
+    <div class="p-col-4">
+      <label for="envid">Id</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="envid" [(ngModel)]="environment.EnvironmetId" autofocus />
+    </div>
+    <div class="p-col-4">
+      <label for="name">Nombre</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="name" [(ngModel)]="environment.Name" autofocus />
+    </div>
+    <div class="p-col-4">
+      <label for="Description">Descripcion</label>
+    </div>
+    <div class="p-col-8">
+      <input pInputText id="Description" [(ngModel)]="environment.Description" />
+    </div>
+    <div class="p-col-4">
+      <label for="CreateAt">Instancias</label>
+    </div>
+    <div class="p-col-8">
+      <button (click)="showInstanceConfig(environment.Instances)" pButton type="button" class="ui-button-secondary" icon="pi pi-cog"></button>
+    </div>
+    <div class="p-col-4">
+      <label for="CreateAt">Endpoints</label>
+    </div>
+    <div class="p-col-8">
+      <button (click)="showEndpointsConfig(environment.EndPoints)" pButton type="button" class="ui-button-secondary" icon="pi pi-cog"></button>
+    </div>
+    <div class="p-col-4">
+      <label for="IsEnable">Activo</label>
+    </div>
+    <div class="p-col-8">
+      <!-- <input pInputText id="IsEnable" [(ngModel)]="application.IsEnable" /> -->
+      <p-inputSwitch id="IsEnable" [(ngModel)]="environment.IsEnable"></p-inputSwitch>
+    </div>
+  </div>
+  <p-footer>
+    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+      <button type="button" pButton icon="pi pi-times" (click)="onDelete()" label="Delete" class="ui-button-danger"></button>
+      <button type="button" pButton icon="pi pi-check" (click)="onUpdate()" label="Save"></button>
+    </div>
+  </p-footer>
+</p-dialog>
